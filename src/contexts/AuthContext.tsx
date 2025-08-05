@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, initializeDemoData } from '../lib/storage';
+import { User as SupabaseUser } from '@supabase/supabase-js';
+import { supabase, signIn, signOut, getCurrentUser, getSession } from '../lib/supabase';
 import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
+  supabaseUser: SupabaseUser | null;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -13,32 +15,76 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Initialize demo data on first load
-    initializeDemoData();
-    
-    // Check if user is already logged in
-    const savedUser = authService.getCurrentUser();
-    const token = authService.getAuthToken();
-    
-    if (savedUser && token) {
-      setUser(savedUser);
-    }
-    
-    setIsLoading(false);
+    // Get initial session
+    getSession().then(({ session }) => {
+      if (session?.user) {
+        setSupabaseUser(session.user);
+        fetchUserProfile(session.user.id);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setSupabaseUser(session.user);
+          await fetchUserProfile(session.user.id);
+        } else {
+          setSupabaseUser(null);
+          setUser(null);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        setIsLoading(false);
+        return;
+      }
+
+      if (data) {
+        setUser(data);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
     try {
-      const loggedInUser = authService.login(email, password);
+      const { data, error } = await signIn(email, password);
       
-      if (loggedInUser) {
-        setUser(loggedInUser);
+      if (error) {
+        console.error('Login error:', error);
         setIsLoading(false);
+        return false;
+      }
+
+      if (data.user) {
+        setSupabaseUser(data.user);
+        await fetchUserProfile(data.user.id);
         return true;
       }
       
@@ -51,13 +97,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    authService.logout();
-    setUser(null);
+  const logout = async () => {
+    setIsLoading(true);
+    
+    try {
+      await signOut();
+      setUser(null);
+      setSupabaseUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, supabaseUser, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
