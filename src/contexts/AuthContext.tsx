@@ -97,6 +97,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const register = async (email: string, password: string, name: string): Promise<boolean> => {
+    setIsLoading(true);
+    
+    try {
+      const { data, error } = await signUp(email, password, name);
+      
+      if (error) {
+        console.error('Registration error:', error);
+        setIsLoading(false);
+        return false;
+      }
+
+      if (data.user) {
+        setSupabaseUser(data.user);
+        // The user profile will be created by the database trigger or edge function
+        // For now, we'll wait for the auth state change to fetch the profile
+        return true;
+      }
+      
+      setIsLoading(false);
+      return false;
+    } catch (error) {
+      console.error('Registration error:', error);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     
