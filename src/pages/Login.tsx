@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff, User } from 'lucide-react';
 export default function Login() {
-  const { login, isLoading } = useAuth();
+  const { login, register, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -12,9 +14,16 @@ export default function Login() {
     e.preventDefault();
     setError('');
     
-    const success = await login(email, password);
-    if (!success) {
-      setError('Invalid credentials. Please check your email and password.');
+    if (isSignUp) {
+      const success = await register(email, password, name);
+      if (!success) {
+        setError('Registration failed. Please try again.');
+      }
+    } else {
+      const success = await login(email, password);
+      if (!success) {
+        setError('Invalid credentials. Please check your email and password.');
+      }
     }
   };
 
