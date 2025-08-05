@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
-
+import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff, User } from 'lucide-react';
 export default function Login() {
   const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
@@ -31,7 +30,9 @@ export default function Login() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent mb-2">
               Support Hub
             </h1>
-            <p className="text-grey-600 text-lg">Welcome back to your workspace</p>
+            <p className="text-grey-600 text-lg">
+              {isSignUp ? 'Create your account' : 'Welcome back to your workspace'}
+            </p>
           </div>
 
           {/* Main Login Card */}
@@ -48,6 +49,26 @@ export default function Login() {
 
             {/* Email/Password Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
+              {isSignUp && (
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-grey-700 mb-3">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-grey-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 border-2 border-grey-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 bg-grey-50/50 hover:bg-white"
+                      placeholder="Enter your full name"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-grey-700 mb-3">
                   Email Address
@@ -115,13 +136,29 @@ export default function Login() {
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Signing in...</span>
+                    <span>{isSignUp ? 'Creating account...' : 'Signing in...'}</span>
                   </div>
                 ) : (
-                  'Sign In'
+                  isSignUp ? 'Create Account' : 'Sign In'
                 )}
               </button>
             </form>
+          </div>
+
+          {/* Toggle Sign Up / Sign In */}
+          <div className="text-center">
+            <button
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+                setEmail('');
+                setPassword('');
+                setName('');
+              }}
+              className="text-red-600 hover:text-red-700 font-medium transition-colors"
+            >
+              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+            </button>
           </div>
 
           {/* Footer */}

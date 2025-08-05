@@ -33,3 +33,30 @@ export const getSession = async () => {
   const { data: { session }, error } = await supabase.auth.getSession();
   return { session, error };
 };
+
+export const signUp = async (email: string, password: string, name: string) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+  
+  if (error) return { data: null, error };
+  
+  // Create user profile after successful signup
+  if (data.user) {
+    const { error: profileError } = await supabase
+      .from('users')
+      .insert([{
+        id: data.user.id,
+        email: data.user.email!,
+        name: name,
+        role: 'user' // Default role, admin can change later
+      }]);
+    
+    if (profileError) {
+      console.error('Error creating user profile:', profileError);
+    }
+  }
+  
+  return { data, error };
+};
