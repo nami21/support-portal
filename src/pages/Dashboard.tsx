@@ -57,7 +57,7 @@ const quickActions = [
     icon: Ticket,
     color: 'from-red-600 to-red-700',
     hoverColor: 'hover:from-red-700 hover:to-red-800',
-    link: '/create-ticket'
+    link: 'https://mail.google.com/mail/?view=cm&fs=1&to=support@example.com&su=Support%20Ticket&body=Hi%2C%20I%20need%20help%20with...'
   },
   {
     title: 'AI Assistant',
