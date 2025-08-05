@@ -6,7 +6,6 @@ import Layout from './components/Layout';
 import Chatbot from './components/Chatbot';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import CreateTicket from './pages/CreateTicket';
 import ContactSupport from './pages/ContactSupport';
 import Announcements from './pages/Announcements';
 import SystemUpdates from './pages/SystemUpdates';
@@ -33,7 +32,6 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard onToggleChat={() => setIsChatOpen(!isChatOpen)} />} />
               <Route path="spotlights" element={<SpotlightsPage />} />
-              <Route path="create-ticket" element={<CreateTicket />} />
               <Route path="contact-support" element={<ContactSupport />} />
               <Route path="announcements" element={<Announcements />} />
               <Route path="system-updates" element={<SystemUpdates />} />

@@ -57,7 +57,7 @@ const quickActions = [
     icon: Ticket,
     color: 'from-red-600 to-red-700',
     hoverColor: 'hover:from-red-700 hover:to-red-800',
-    link: 'https://mail.google.com/mail/?view=cm&fs=1&to=support@example.com&su=Support%20Ticket&body=Hi%2C%20I%20need%20help%20with...'
+    link: 'https://mail.google.com/mail/?view=cm&fs=1&to=support@company.com&su=Support%20Request&body=Hi%20Support%20Team%2C%0A%0AI%20need%20assistance%20with%3A%0A%0A-%20Issue%20Description%3A%20%0A-%20Priority%3A%20%0A-%20Additional%20Details%3A%20%0A%0AThank%20you%21'
   },
   {
     title: 'AI Assistant',
@@ -154,9 +154,15 @@ export default function Dashboard({ onOpenChat, onToggleChat }: DashboardProps) 
               );
 
               return action.link ? (
-                <Link key={index} to={action.link}>
-                  {content}
-                </Link>
+                action.link.startsWith('http') ? (
+                  <a key={index} href={action.link} target="_blank" rel="noopener noreferrer">
+                    {content}
+                  </a>
+                ) : (
+                  <Link key={index} to={action.link}>
+                    {content}
+                  </Link>
+                )
               ) : (
                 <div key={index} onClick={() => handleQuickAction(action.action!)}>
                   {content}
