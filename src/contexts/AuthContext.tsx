@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
-import { supabase, signIn, signOut, getCurrentUser, getSession, isSupabaseConfigured } from '../lib/supabase';
+import { signIn, signOut, signUp } from '../lib/supabase';
 import { User } from '../types';
+import { authService } from '../lib/storage';
 
 interface AuthContextType {
   user: User | null;
   supabaseUser: SupabaseUser | null;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => Promise<void>;
   isLoading: boolean;
 }
@@ -19,93 +21,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // If Supabase is not configured, set loading to false immediately
-    if (!isSupabaseConfigured) {
-      setIsLoading(false);
-      return;
+    // Check for existing demo session
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
     }
-    
-    // Get initial session
-    getSession().then(({ session }) => {
-      if (session?.user) {
-        setSupabaseUser(session.user);
-        fetchUserProfile(session.user.id);
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase!.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setSupabaseUser(session.user);
-          await fetchUserProfile(session.user.id);
-        } else {
-          setSupabaseUser(null);
-          setUser(null);
-          setIsLoading(false);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    setIsLoading(false);
   }, []);
-
-  const fetchUserProfile = async (userId: string) => {
-    if (!supabase) {
-      // Demo mode - create a demo user profile
-      const demoUser: User = {
-        id: userId,
-        email: 'demo@company.com',
-        name: 'Demo User',
-        role: 'admin',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      };
-      setUser(demoUser);
-      setIsLoading(false);
-      return;
-    }
-    
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        setIsLoading(false);
-        return;
-      }
-
-      if (data) {
-        setUser(data);
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
     try {
-      const { data, error } = await signIn(email, password);
+      // Use demo authentication
+      const demoUser = authService.login(email, password);
       
-      if (error) {
-        console.error('Login error:', error);
+      if (demoUser) {
+        setUser(demoUser);
         setIsLoading(false);
-        return false;
-      }
-
-      if (data.user) {
-        setSupabaseUser(data.user);
-        await fetchUserProfile(data.user.id);
         return true;
       }
       
@@ -122,23 +55,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     
     try {
-      const { data, error } = await signUp(email, password, name);
+      // Create new demo user
+      const newUser: User = {
+        id: `demo-user-${Date.now()}`,
+        email: email,
+        name: name,
+        role: 'user',
+        isActive: true,
+        createdAt: new Date().toISOString()
+      };
       
-      if (error) {
-        console.error('Registration error:', error);
-        setIsLoading(false);
-        return false;
-      }
-
-      if (data.user) {
-        setSupabaseUser(data.user);
-        // The user profile will be created by the database trigger or edge function
-        // For now, we'll wait for the auth state change to fetch the profile
-        return true;
-      }
-      
+      // Store in localStorage and set as current user
+      localStorage.setItem('auth_token', 'demo_token');
+      localStorage.setItem('current_user', JSON.stringify(newUser));
+      setUser(newUser);
       setIsLoading(false);
-      return false;
+      return true;
     } catch (error) {
       console.error('Registration error:', error);
       setIsLoading(false);
@@ -150,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     
     try {
-      await signOut();
+      authService.logout();
       setUser(null);
       setSupabaseUser(null);
     } catch (error) {

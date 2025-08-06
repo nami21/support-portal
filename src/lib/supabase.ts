@@ -1,101 +1,53 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../types/database';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Force demo mode by not creating Supabase client
+export const supabase = null;
+export const isSupabaseConfigured = false;
 
-// Create a dummy client if environment variables are missing (for demo purposes)
-const createSupabaseClient = () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase environment variables not found. Using demo mode.');
-    // Return a mock client for demo purposes
-    return null;
-  }
-  return createClient<Database>(supabaseUrl, supabaseAnonKey);
-};
-
-export const supabase = createSupabaseClient();
-export const isSupabaseConfigured = !!supabase;
-
-// Auth helpers
+// Demo authentication functions
 export const signIn = async (email: string, password: string) => {
-  if (!supabase) {
-    // Demo mode - simulate login
-    if (password === 'demo_password') {
+  // Demo mode - simulate login with demo accounts
+  if (password === 'demo_password') {
+    const demoUsers = [
+      { email: 'admin@company.com', name: 'Admin User', role: 'admin' },
+      { email: 'cto@company.com', name: 'CTO Admin', role: 'admin' },
+      { email: 'support@company.com', name: 'Support Agent', role: 'support' },
+      { email: 'user@company.com', name: 'Regular User', role: 'user' },
+      { email: 'unassigned@company.com', name: 'Unassigned User', role: 'unassigned' }
+    ];
+    
+    const user = demoUsers.find(u => u.email === email);
+    if (user) {
       const demoUser = {
-        id: 'demo-user-id',
-        email: email,
-        user_metadata: { name: 'Demo User' }
+        id: `demo-${user.role}-${Date.now()}`,
+        email: user.email,
+        user_metadata: { name: user.name, role: user.role }
       };
       return { data: { user: demoUser, session: null }, error: null };
     }
-    return { data: null, error: { message: 'Invalid credentials' } };
   }
-  
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  return { data, error };
+  return { data: null, error: { message: 'Invalid credentials. Use demo_password for demo accounts.' } };
 };
 
 export const signOut = async () => {
-  if (!supabase) {
-    return { error: null };
-  }
-  const { error } = await supabase.auth.signOut();
-  return { error };
+  return { error: null };
 };
 
 export const getCurrentUser = async () => {
-  if (!supabase) {
-    return { user: null, error: null };
-  }
-  const { data: { user }, error } = await supabase.auth.getUser();
-  return { user, error };
+  return { user: null, error: null };
 };
 
 export const getSession = async () => {
-  if (!supabase) {
-    return { session: null, error: null };
-  }
-  const { data: { session }, error } = await supabase.auth.getSession();
-  return { session, error };
+  return { session: null, error: null };
 };
 
 export const signUp = async (email: string, password: string, name: string) => {
-  if (!supabase) {
-    // Demo mode - simulate signup
-    const demoUser = {
-      id: 'demo-user-' + Date.now(),
-      email: email,
-      user_metadata: { name: name }
-    };
-    return { data: { user: demoUser, session: null }, error: null };
-  }
-  
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-  
-  if (error) return { data: null, error };
-  
-  // Create user profile after successful signup
-  if (data.user) {
-    const { error: profileError } = await supabase
-      .from('users')
-      .insert([{
-        id: data.user.id,
-        email: data.user.email!,
-        name: name,
-        role: 'user' // Default role, admin can change later
-      }]);
-    
-    if (profileError) {
-      console.error('Error creating user profile:', profileError);
-    }
-  }
-  
-  return { data, error };
+  // Demo mode - simulate signup
+  const demoUser = {
+    id: 'demo-user-' + Date.now(),
+    email: email,
+    user_metadata: { name: name, role: 'user' }
+  };
+  return { data: { user: demoUser, session: null }, error: null };
 };
