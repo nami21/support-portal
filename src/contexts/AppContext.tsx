@@ -58,6 +58,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (user) {
       loadAllData();
     } else {
+      // Reset data when no user
+      setFaqs([]);
+      setAnnouncements([]);
+      setSystemUpdates([]);
+      setOtherDocuments([]);
+      setTrainingMaterials([]);
       setIsLoading(false);
     }
   }, [user]);
@@ -65,12 +71,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const loadAllData = async () => {
     setIsLoading(true);
     try {
-      // Use localStorage data in demo mode
-      setFaqs(dataService.getFaqs());
-      setAnnouncements(dataService.getAnnouncements());
-      setSystemUpdates(dataService.getSystemUpdates());
-      setOtherDocuments(dataService.getOtherDocuments());
-      setTrainingMaterials(dataService.getTrainingMaterials());
+      // Load demo data from localStorage
+      const loadedFaqs = dataService.getFaqs();
+      const loadedAnnouncements = dataService.getAnnouncements();
+      const loadedSystemUpdates = dataService.getSystemUpdates();
+      const loadedOtherDocuments = dataService.getOtherDocuments();
+      const loadedTrainingMaterials = dataService.getTrainingMaterials();
+      
+      console.log('Loading demo data:', {
+        faqs: loadedFaqs.length,
+        announcements: loadedAnnouncements.length,
+        systemUpdates: loadedSystemUpdates.length,
+        otherDocuments: loadedOtherDocuments.length,
+        trainingMaterials: loadedTrainingMaterials.length
+      });
+      
+      setFaqs(loadedFaqs);
+      setAnnouncements(loadedAnnouncements);
+      setSystemUpdates(loadedSystemUpdates);
+      setOtherDocuments(loadedOtherDocuments);
+      setTrainingMaterials(loadedTrainingMaterials);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {

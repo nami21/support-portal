@@ -23,6 +23,8 @@ import {SpotlightsPage} from './pages/Spotlights/SpotlightsPage';
 // Initialize demo data on app start
 initializeDemoData();
 
+// Add debug logging
+console.log('Demo data initialized');
 // Protected Route Component
 function ProtectedRoutes() {
   const { user, isLoading } = useAuth();

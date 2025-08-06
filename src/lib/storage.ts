@@ -600,6 +600,8 @@ export const dataService = {
 export const initializeDemoData = (): void => {
   const isInitialized = localStorage.getItem(STORAGE_KEYS.INITIALIZED);
   
+  console.log('Initializing demo data, already initialized:', !!isInitialized);
+  
   if (!isInitialized) {
     // Initialize users with IDs
     const usersWithIds = demoUsers.map(user => ({
@@ -648,5 +650,8 @@ export const initializeDemoData = (): void => {
     saveToStorage(STORAGE_KEYS.TICKETS, []);
 
     localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
+    console.log('Demo data initialization complete');
+  } else {
+    console.log('Demo data already exists, skipping initialization');
   }
 };
