@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
-import { supabase, signIn, signOut, getCurrentUser, getSession } from '../lib/supabase';
+import { supabase, signIn, signOut, getCurrentUser, getSession, isSupabaseConfigured } from '../lib/supabase';
 import { User } from '../types';
 
 interface AuthContextType {
@@ -19,6 +19,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // If Supabase is not configured, set loading to false immediately
+    if (!isSupabaseConfigured) {
+      setIsLoading(false);
+      return;
+    }
+    
     // Get initial session
     getSession().then(({ session }) => {
       if (session?.user) {
@@ -30,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase!.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
           setSupabaseUser(session.user);
@@ -47,6 +53,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
+    if (!supabase) {
+      // Demo mode - create a demo user profile
+      const demoUser: User = {
+        id: userId,
+        email: 'demo@company.com',
+        name: 'Demo User',
+        role: 'admin',
+        isActive: true,
+        createdAt: new Date().toISOString()
+      };
+      setUser(demoUser);
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('users')

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
+import { initializeDemoData } from './lib/storage';
 import Layout from './components/Layout';
 import Chatbot from './components/Chatbot';
 import Login from './pages/Login';
@@ -18,6 +19,9 @@ import UnassignedRole from './pages/UnassignedRole';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import {SpotlightsPage} from './pages/Spotlights/SpotlightsPage';
+
+// Initialize demo data on app start
+initializeDemoData();
 
 // Protected Route Component
 function ProtectedRoutes() {
