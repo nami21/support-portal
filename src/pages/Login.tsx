@@ -4,10 +4,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
-  const { user, login, isLoading } = useAuth();
+  const { user, login, isLoading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showDemoAccounts, setShowDemoAccounts] = useState(false);
 
@@ -17,11 +17,11 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setLocalError('');
     
     const success = await login(email, password);
     if (!success) {
-      setError('Invalid credentials. Please try again.');
+      setLocalError(error || 'Invalid credentials. Please try again.');
     }
   };
 
@@ -61,7 +61,7 @@ export default function Login() {
   const fillDemoCredentials = (email: string, password: string) => {
     setEmail(email);
     setPassword(password);
-    setError('');
+    setLocalError('');
   };
 
   return (
@@ -81,12 +81,12 @@ export default function Login() {
 
         {/* Main Login Card */}
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 mb-6">
-          {error && (
+          {(localError || error) && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-3 text-red-700">
               <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-medium">Authentication Error</p>
-                <p className="text-sm mt-1">{error}</p>
+                <p className="text-sm mt-1">{localError || error}</p>
               </div>
             </div>
           )}
@@ -172,12 +172,12 @@ export default function Login() {
         {/* Demo Accounts Section */}
         <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/50 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-grey-700">Demo Environment</h3>
+            <h3 className="text-sm font-semibold text-grey-700">Pre-created Accounts</h3>
             <button
               onClick={() => setShowDemoAccounts(!showDemoAccounts)}
               className="text-xs text-red-600 hover:text-red-700 font-medium transition-colors"
             >
-              {showDemoAccounts ? 'Hide' : 'Show'} Demo Accounts
+              {showDemoAccounts ? 'Hide' : 'Show'} Available Accounts
             </button>
           </div>
           
@@ -212,7 +212,7 @@ export default function Login() {
               ))}
               <div className="pt-2 border-t border-slate-200">
                 <p className="text-xs text-grey-500 text-center">
-                  <span className="font-medium">Password:</span> demo_password
+                  <span className="font-medium">All accounts use password:</span> demo_password
                 </p>
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function Login() {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-sm text-grey-500">
-            Need help? Contact{' '}
+            Need access? Contact your administrator or{' '}
             <a href="mailto:support@company.com" className="text-red-600 hover:text-red-700 font-medium">
               support@company.com
             </a>
