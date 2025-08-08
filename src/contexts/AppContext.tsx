@@ -63,7 +63,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Helper function to check if user is admin
   const isAdmin = () => user?.role === 'admin';
   const isSupport = () => user?.role === 'support' || user?.role === 'admin';
-  const isAdminOrCTO = () => user?.role === 'admin' || (user?.role === 'admin' && user?.jobTitle?.includes('CTO'));
 
   // Load data when user is authenticated
   useEffect(() => {

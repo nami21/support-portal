@@ -32,8 +32,6 @@ export interface Database {
           email: string;
           name: string;
           role: 'admin' | 'support' | 'user';
-          department: string | null;
-          is_active: boolean;
           password_hash: string;
           created_at: string;
         };
@@ -42,8 +40,6 @@ export interface Database {
           email: string;
           name: string;
           role?: 'admin' | 'support' | 'user';
-          department?: string | null;
-          is_active?: boolean;
           password_hash: string;
           created_at?: string;
         };
@@ -52,8 +48,6 @@ export interface Database {
           email?: string;
           name?: string;
           role?: 'admin' | 'support' | 'user';
-          department?: string | null;
-          is_active?: boolean;
           password_hash?: string;
           created_at?: string;
         };

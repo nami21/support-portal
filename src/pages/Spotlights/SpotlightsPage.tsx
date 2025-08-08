@@ -17,7 +17,7 @@ export const SpotlightsPage: React.FC = () => {
   const [currentUser] = useState<SpotlightUser>({
     id: user?.id || 'current-user',
     name: user?.name || 'Current User',
-    avatar: user?.profilePhoto || '',
+    avatar: '',
     role: user?.role === 'admin' ? 'admin' : user?.role === 'support' ? 'support' : 'user'
   });
 

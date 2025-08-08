@@ -3,20 +3,7 @@ export interface User {
   email: string;
   name: string;
   role: 'admin' | 'support' | 'user' | 'unassigned';
-  division?: string;
-  isActive: boolean;
   createdAt: string;
-  // Extended profile fields
-  profilePhoto?: string;
-  birthday?: string;
-  dateHired?: string;
-  address?: string;
-  bio?: string;
-  phoneNumber?: string;
-  department?: string;
-  jobTitle?: string;
-  servicePhoneNumber?: string;
-  immediateSuperior?: string;
 }
 
 export interface FAQ {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, Mail, Lock, AlertCircle, Chrome, Eye, EyeOff } from 'lucide-react';
+import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const { user, login, isLoading } = useAuth();
@@ -10,7 +10,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showDemoAccounts, setShowDemoAccounts] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   if (user) {
     return <Navigate to="/" replace />;
@@ -26,30 +25,12 @@ export default function Login() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true);
-    setError('');
-    
-    try {
-      // In a real implementation, this would integrate with Google OAuth
-      // For now, we'll show a placeholder message
-      setTimeout(() => {
-        setError('Google SSO integration pending. Please use demo accounts below.');
-        setIsGoogleLoading(false);
-        setShowDemoAccounts(true);
-      }, 1000);
-    } catch (error) {
-      setError('Google sign-in failed. Please try again.');
-      setIsGoogleLoading(false);
-    }
-  };
-
   const demoAccounts = [
     { 
       email: 'cto@company.com', 
       role: 'Admin User', 
       password: 'demo_password',
-      description: 'ull system access, user management, content creation'
+      description: 'Full system access, user management, content creation'
     },
     { 
       email: 'admin@company.com', 
@@ -109,34 +90,6 @@ export default function Login() {
               </div>
             </div>
           )}
-
-          {/* Google SSO Button */}
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={isGoogleLoading}
-            className="w-full mb-6 py-4 px-6 bg-white border-2 border-grey-200 rounded-xl hover:border-grey-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
-          >
-            <div className="flex items-center justify-center space-x-3">
-              {isGoogleLoading ? (
-                <div className="w-5 h-5 border-2 border-grey-300 border-t-red-600 rounded-full animate-spin" />
-              ) : (
-                <Chrome className="w-5 h-5 text-grey-600 group-hover:text-black transition-colors" />
-              )}
-              <span className="font-medium text-grey-700 group-hover:text-black transition-colors">
-                {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
-              </span>
-            </div>
-          </button>
-
-          {/* Divider */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-grey-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-grey-500 font-medium">Or sign in with email</span>
-            </div>
-          </div>
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -41,39 +41,30 @@ const demoUsers: Omit<User, 'id'>[] = [
     email: 'admin@company.com',
     name: 'Admin User',
     role: 'admin',
-    division: 'IT',
-    isActive: true,
     createdAt: new Date().toISOString()
   },
   {
     email: 'cto@company.com',
     name: 'CTO Admin',
     role: 'admin',
-    division: 'IT',
-    isActive: true,
     createdAt: new Date().toISOString()
   },
   {
     email: 'support@company.com',
     name: 'Support Agent',
     role: 'support',
-    division: 'Support',
-    isActive: true,
     createdAt: new Date().toISOString()
   },
   {
     email: 'user@company.com',
     name: 'Regular User',
     role: 'user',
-    division: 'Sales',
-    isActive: true,
     createdAt: new Date().toISOString()
   },
   {
     email: 'unassigned@company.com',
     name: 'Unassigned User',
     role: 'unassigned',
-    isActive: true,
     createdAt: new Date().toISOString()
   }
 ];
@@ -314,7 +305,7 @@ export const authService = {
     if (password !== 'demo_password') return null;
     
     const users = getFromStorage<User>(STORAGE_KEYS.USERS);
-    const user = users.find(u => u.email === email && u.isActive);
+    const user = users.find(u => u.email === email);
     
     if (user) {
       localStorage.setItem('auth_token', 'demo_token');
