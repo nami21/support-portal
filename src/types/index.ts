@@ -43,19 +43,6 @@ export interface SystemUpdate {
   createdAt: string;
 }
 
-export interface Ticket {
-  id: string;
-  title: string;
-  category: 'it-support' | 'hr' | 'facilities' | 'other';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  description: string;
-  attachments?: string[];
-  status: 'open' | 'in-progress' | 'resolved' | 'closed';
-  createdBy: string;
-  assignedTo?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface ChatMessage {
   id: string;

@@ -1,5 +1,5 @@
 // Local storage service for managing application data
-import { User, FAQ, Announcement, SystemUpdate, Ticket, ChatMessage, OtherDocument, TrainingMaterial } from '../types';
+import { User, FAQ, Announcement, SystemUpdate, ChatMessage, OtherDocument, TrainingMaterial } from '../types';
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -7,7 +7,6 @@ const STORAGE_KEYS = {
   FAQS: 'support_hub_faqs',
   ANNOUNCEMENTS: 'support_hub_announcements',
   SYSTEM_UPDATES: 'support_hub_system_updates',
-  TICKETS: 'support_hub_tickets',
   CHAT_MESSAGES: 'support_hub_chat_messages',
   OTHER_DOCUMENTS: 'support_hub_other_documents',
   TRAINING_MATERIALS: 'support_hub_training_materials',
@@ -478,23 +477,6 @@ export const dataService = {
     return true;
   },
 
-  // Tickets
-  getTickets: (): Ticket[] => getFromStorage<Ticket>(STORAGE_KEYS.TICKETS),
-  
-  addTicket: (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Ticket => {
-    const tickets = getFromStorage<Ticket>(STORAGE_KEYS.TICKETS);
-    const newTicket: Ticket = {
-      ...ticketData,
-      id: generateId(),
-      status: 'open',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    tickets.push(newTicket);
-    saveToStorage(STORAGE_KEYS.TICKETS, tickets);
-    return newTicket;
-  },
-
   // Other Documents
   getOtherDocuments: (): OtherDocument[] => getFromStorage<OtherDocument>(STORAGE_KEYS.OTHER_DOCUMENTS),
   
@@ -636,7 +618,6 @@ export const initializeDemoData = (): void => {
     saveToStorage(STORAGE_KEYS.TRAINING_MATERIALS, materialsWithIds);
 
     // Initialize empty arrays for other data
-    saveToStorage(STORAGE_KEYS.TICKETS, []);
 
     localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
   }

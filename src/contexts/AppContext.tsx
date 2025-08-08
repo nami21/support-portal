@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { dataService } from '../lib/storage';
 import { useAuth } from './AuthContext';
-import { FAQ, Announcement, SystemUpdate, Ticket, ChatMessage, User, OtherDocument, TrainingMaterial } from '../types';
+import { FAQ, Announcement, SystemUpdate, ChatMessage, User, OtherDocument, TrainingMaterial } from '../types';
 
 interface AppContextType {
   // FAQ Management
@@ -21,10 +21,6 @@ interface AppContextType {
   addSystemUpdate: (update: Omit<SystemUpdate, 'id' | 'createdAt'>) => Promise<void>;
   updateSystemUpdate: (id: string, update: Partial<SystemUpdate>) => Promise<void>;
   deleteSystemUpdate: (id: string) => Promise<void>;
-  
-  // User Management
-  tickets: Ticket[];
-  createTicket: (ticket: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => Promise<void>;
   
   // Other Document Management
   otherDocuments: OtherDocument[];
@@ -54,7 +50,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [systemUpdates, setSystemUpdates] = useState<SystemUpdate[]>([]);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [otherDocuments, setOtherDocuments] = useState<OtherDocument[]>([]);
   const [trainingMaterials, setTrainingMaterials] = useState<TrainingMaterial[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -80,7 +75,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setFaqs(dataService.getFaqs());
       setAnnouncements(dataService.getAnnouncements());
       setSystemUpdates(dataService.getSystemUpdates());
-      setTickets(dataService.getTickets());
       setOtherDocuments(dataService.getOtherDocuments());
       setTrainingMaterials(dataService.getTrainingMaterials());
       
@@ -194,12 +188,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Ticket Management
-  const createTicket = async (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => {
-    const newTicket = dataService.addTicket(ticketData);
-    setTickets(prev => [newTicket, ...prev.filter(t => t.id !== newTicket.id)]);
-  };
-
   // Other Document Management
   const addOtherDocument = async (documentData: Omit<OtherDocument, 'id' | 'createdAt'>) => {
     if (!isSupport()) {
@@ -285,7 +273,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       faqs, addFaq, updateFaq, deleteFaq,
       announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement,
       systemUpdates, addSystemUpdate, updateSystemUpdate, deleteSystemUpdate,
-      tickets, createTicket,
       otherDocuments, addOtherDocument, updateOtherDocument, deleteOtherDocument,
       trainingMaterials, addTrainingMaterial, updateTrainingMaterial, deleteTrainingMaterial,
       chatMessages, addChatMessage, clearChat,
