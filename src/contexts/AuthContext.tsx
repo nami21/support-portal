@@ -89,61 +89,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.user) {
-        // Fetch user data from the users table to get the correct role
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('email', data.user.email)
-          .single();
-
-        if (userError) {
-          console.error('Error fetching user data:', userError);
-          setError('User not found in system');
-          setIsLoading(false);
-          return false;
-        }
-
-        // Use session user data directly to avoid RLS recursion
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          name: session.user.user_metadata?.name || session.user.email || '',
-          role: session.user.user_metadata?.role || 'user',
-          createdAt: session.user.created_at || new Date().toISOString()
-        });
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      setError('Authentication check failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        setError(error.message);
-        setIsLoading(false);
-        return false;
-      }
-
-      if (data.user) {
         // Use auth user data directly to avoid RLS recursion
         setUser({
-          id: userData.id,
-          email: userData.email,
-          name: userData.name,
-          role: userData.role,
-          createdAt: userData.created_at
+          id: data.user.id,
+          email: data.user.email || '',
+          name: data.user.user_metadata?.name || data.user.email || '',
+          role: data.user.user_metadata?.role || 'user',
+          createdAt: data.user.created_at || new Date().toISOString()
         });
         
         setIsLoading(false);
